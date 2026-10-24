@@ -39,9 +39,10 @@ async def main():
     todo = [p for p in prompts if (p["qid"], p["cond"]) not in done]
     print(f"{a.model}: {len(keep)} questions, {len(done)} cached, {len(todo)} to run", flush=True)
     g = Gemini(rpm=a.rpm)
-    cfg = types.GenerateContentConfig(
-        temperature=0.0, max_output_tokens=a.budget + 2048,
-        thinking_config=types.ThinkingConfig(include_thoughts=True, thinking_budget=a.budget))
+    # Gemma 4 rejects thinking_budget; it thinks by default and returns its thoughts as thought parts.
+    tc = (types.ThinkingConfig(include_thoughts=True) if a.model.startswith("gemma") else
+          types.ThinkingConfig(include_thoughts=True, thinking_budget=a.budget))
+    cfg = types.GenerateContentConfig(temperature=0.0, max_output_tokens=16384 if a.model.startswith("gemma") else a.budget + 2048, thinking_config=tc)
 
     async def one(p):
         try:
@@ -61,7 +62,8 @@ async def main():
                    response="\n".join(answer), thought_tokens=getattr(u, "thoughts_token_count", None),
                    output_tokens=getattr(u, "candidates_token_count", None),
                    finish=str(cand.finish_reason) if cand else None)
-        row["pred"] = parse_answer(row["response"]) or parse_answer(row["thoughts"])
+        # Final answer from the user-facing response only; a truncated (MAX_TOKENS) response stays unparsed.
+        row["pred"] = parse_answer(row["response"])
         append_jsonl(out, row)
 
     try:
