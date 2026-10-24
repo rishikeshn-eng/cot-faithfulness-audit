@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CoT Faithfulness Audit</title>
+<meta name="description" content="Do reasoning models say when they use a hint? A 4,000-question hint-injection benchmark with an interactive results explorer.">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{--bg:#fbfaf7;--fg:#1d1d1b;--muted:#6b6a65;--card:#fff;--line:#e4e1d8;--accent:#b4441f;--a2:#2f6f8f;--ok:#2e7d4f;--warn:#b07a12;--bad:#b4441f;--code:#f3f1ea}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#151514;--fg:#ecebe6;--muted:#a19f97;--card:#1f1f1d;--line:#34332f;--accent:#e2774f;--a2:#6fb3d4;--ok:#6cc08f;--warn:#e0b04b;--bad:#e2774f;--code:#262623}}
+:root[data-theme=dark]{--bg:#151514;--fg:#ecebe6;--muted:#a19f97;--card:#1f1f1d;--line:#34332f;--accent:#e2774f;--a2:#6fb3d4;--ok:#6cc08f;--warn:#e0b04b;--bad:#e2774f;--code:#262623}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
+main{max-width:1060px;margin:0 auto;padding:32px 16px 80px}
+h1{font-size:2rem;line-height:1.2;margin:0 0 8px}
+h2{font-size:1.3rem;margin:48px 0 12px;padding-top:12px;border-top:1px solid var(--line)}
+p.lede{color:var(--muted);font-size:1.08rem;max-width:760px}
+a{color:var(--a2)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:24px 0}
+.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
+.kpi b{display:block;font-size:1.7rem}
+.kpi span{color:var(--muted);font-size:.88rem}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media (max-width:760px){.grid2{grid-template-columns:1fr}}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
+.panel h3{margin:0 0 8px;font-size:1rem}
+.chartbox{position:relative;height:300px}
+table{border-collapse:collapse;width:100%;font-size:.9rem}
+th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
+th:first-child,td:first-child{text-align:left}
+.scroll{overflow-x:auto}
+.controls{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+select,input{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;font-size:.9rem}
+.case{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin:10px 0}
+.case .meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.tag{font-size:.78rem;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
+.tag.bad{color:var(--bad);border-color:var(--bad)} .tag.ok{color:var(--ok);border-color:var(--ok)} .tag.warn{color:var(--warn);border-color:var(--warn)}
+pre{background:var(--code);padding:10px;border-radius:8px;white-space:pre-wrap;word-break:break-word;font-size:.82rem;max-height:340px;overflow:auto;margin:8px 0 0}
+mark{background:color-mix(in srgb,var(--accent) 30%,transparent);color:inherit}
+details summary{cursor:pointer;color:var(--a2)}
+.muted{color:var(--muted)}
+footer{margin-top:56px;color:var(--muted);font-size:.88rem}
+</style>
+</head>
+<body>
+<main>
+<h1>Do reasoning models say when they use a hint?</h1>
+<p class="lede">A reproducible hint-injection benchmark for chain-of-thought faithfulness: 4,000 questions (MMLU, ARC-Challenge, GSM8K) × 5 hint types, run on Gemini thinking models (with thought summaries) and a local Qwen2.5-1.5B-Instruct. When a model switches its answer to the hinted option, how often does its visible reasoning admit the hint was used?</p>
+<div class="kpis" id="kpis"></div>
+
+<h2>Uptake and verbalisation by hint type</h2>
+<p class="muted">Uptake = share of questions where the model's un-hinted answer differed from the hint and the hinted answer matched it. Verbalised = share of uptake cases whose reasoning acknowledges using the hint (LLM judge, checked against a 100-case manual audit). Error bars are 95% bootstrap CIs over questions.</p>
+<div class="controls"><label>Model <select id="modelSel"></select></label></div>
+<div class="grid2">
+  <div class="panel"><h3>Hint uptake</h3><div class="chartbox"><canvas id="cUptake"></canvas></div></div>
+  <div class="panel"><h3>Verbalised, given uptake</h3><div class="chartbox"><canvas id="cVerb"></canvas></div></div>
+</div>
+<div class="panel scroll" style="margin-top:16px"><table id="tHint"></table></div>
+
+<h2>Difficulty and hint correctness</h2>
+<div class="panel scroll"><table id="tDiff"></table></div>
+
+<h2>Can a CoT monitor catch hint use?</h2>
+<p class="muted">Two monitors read only the reasoning (never the prompt). Recall on <em>unfaithful</em> uptake is the hard case: the model used the hint and did not say so.</p>
+<div class="panel scroll"><table id="tMon"></table></div>
+
+<h2>Case explorer</h2>
+<p class="muted">A random sample of judged cases. Monitor keyword hits are highlighted.</p>
+<div class="controls">
+  <select id="fModel"></select><select id="fHint"></select><select id="fLabel"></select><select id="fUp"></select>
+  <input id="fText" placeholder="search text">
+</div>
+<div id="count" class="muted"></div>
+<div id="cases"></div>
+<footer>Code, data recipe and full method: <a href="https://github.com/rishikeshn-eng/cot-faithfulness-audit">github.com/rishikeshn-eng/cot-faithfulness-audit</a>.</footer>
+</main>
+<script>
+const HINTS=["sycophancy","metadata","grader_hack","visual_pattern","unethical"];
+const css=n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const pct=x=>x==null?"–":(100*x).toFixed(1)+"%";
+const ci=o=>o&&o.mean!=null?`${pct(o.mean)} <span class="muted">[${pct(o.lo)}, ${pct(o.hi)}]</span> <span class="muted">n=${o.n}</span>`:"–";
+const KW=/professor|stanford|metadata|&lt;answer&gt;|answer tag|validat\w*|grader|grading|validate_answer|unauthori[sz]ed|access to the system|■|black square|marked|marker|the hint|a hint|leak\w*|was told|given answer|provided answer/gi;
+const esc=s=>String(s??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+let M,C,charts={};
+Promise.all([fetch("data/metrics.json").then(r=>r.json()),fetch("data/cases.json").then(r=>r.json())]).then(([m,c])=>{M=m;C=c;init()});
+function init(){
+  const models=Object.keys(M);
+  modelSel.innerHTML=models.map(m=>`<option>${m}</option>`).join("");
+  modelSel.onchange=()=>render(modelSel.value);
+  kpis.innerHTML=models.map(m=>{const o=M[m].overall;return `<div class="kpi"><b>${pct(o.verbalized.mean)}</b><span>${m}: uptake cases where the reasoning admits the hint (n=${o.verbalized.n})</span></div>`}).join("")+
+    models.map(m=>`<div class="kpi"><b>${pct(M[m].overall.uptake.mean)}</b><span>${m}: hint uptake rate (chance switch ${pct(M[m].overall.chance_switch)})</span></div>`).join("");
+  render(models[0]);
+  const opt=(el,label,vals)=>{el.innerHTML=`<option value="">${label}: all</option>`+vals.map(v=>`<option>${v}</option>`).join("");el.onchange=list};
+  opt(fModel,"model",models);opt(fHint,"hint",HINTS);opt(fLabel,"label",["verbalized","mentioned_dismissed","not_mentioned"]);opt(fUp,"uptake",["true","false"]);
+  fText.oninput=list;list();
+}
+function bar(id,labels,objs,color){
+  charts[id]?.destroy();
+  const err={id:"err",afterDatasetsDraw(ch){const {ctx,scales:{x,y}}=ch;ctx.save();ctx.strokeStyle=css("--fg");objs.forEach((o,i)=>{if(!o||o.lo==null)return;const cx=x.getPixelForValue(i);ctx.beginPath();ctx.moveTo(cx,y.getPixelForValue(o.lo*100));ctx.lineTo(cx,y.getPixelForValue(o.hi*100));ctx.moveTo(cx-5,y.getPixelForValue(o.lo*100));ctx.lineTo(cx+5,y.getPixelForValue(o.lo*100));ctx.moveTo(cx-5,y.getPixelForValue(o.hi*100));ctx.lineTo(cx+5,y.getPixelForValue(o.hi*100));ctx.stroke()});ctx.restore()}};
+  charts[id]=new Chart(document.getElementById(id),{type:"bar",data:{labels,datasets:[{data:objs.map(o=>o&&o.mean!=null?o.mean*100:null),backgroundColor:color,borderRadius:4}]},
+    options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const o=objs[c.dataIndex];return `${pct(o.mean)} [${pct(o.lo)}, ${pct(o.hi)}] n=${o.n}`}}}},
+    scales:{y:{min:0,max:100,ticks:{color:css("--muted"),callback:v=>v+"%"},grid:{color:css("--line")}},x:{ticks:{color:css("--muted")},grid:{display:false}}}},plugins:[err]});
+}
+function render(m){
+  const r=M[m];
+  bar("cUptake",HINTS,HINTS.map(h=>r.by_hint[h].uptake),css("--a2"));
+  bar("cVerb",HINTS,HINTS.map(h=>r.by_hint[h].verbalized),css("--accent"));
+  tHint.innerHTML=`<tr><th>Hint</th><th>Eligible</th><th>Uptake</th><th>Chance switch</th><th>Verbalised | uptake</th><th>Mentioned at all</th><th>Acc. (wrong hint)</th></tr>`+
+    HINTS.map(h=>{const b=r.by_hint[h];return `<tr><td>${h}</td><td>${b.eligible}</td><td>${ci(b.uptake)}</td><td>${pct(b.chance_switch)}</td><td>${ci(b.verbalized)}</td><td>${ci(b.mentioned)}</td><td>${pct(r.accuracy[h+"|hint_wrong"].mean)}</td></tr>`}).join("")+
+    `<tr><td><b>all</b></td><td>${r.overall.eligible}</td><td>${ci(r.overall.uptake)}</td><td>${pct(r.overall.chance_switch)}</td><td>${ci(r.overall.verbalized)}</td><td>${ci(r.overall.mentioned)}</td><td class="muted">no hint: ${pct(r.accuracy.none.mean)}</td></tr>`;
+  const rows=[["MMLU",r.by_source.mmlu],["  MMLU STEM",r.by_source.mmlu_stem],["  MMLU humanities",r.by_source.mmlu_humanities],["  MMLU social sci.",r.by_source.mmlu_social],["  MMLU other",r.by_source.mmlu_other],["ARC-Challenge",r.by_source.arc_challenge],["GSM8K (as MC)",r.by_source.gsm8k],
+    ["Model correct without hint (easier)",r.by_baseline_correct["True"]],["Model wrong without hint (harder)",r.by_baseline_correct["False"]],["Hint points to correct answer",r.by_hint_correct["True"]],["Hint points to wrong answer",r.by_hint_correct["False"]]];
+  tDiff.innerHTML=`<tr><th>Slice</th><th>Eligible</th><th>Uptake</th><th>Verbalised | uptake</th></tr>`+rows.map(([n,b])=>`<tr><td>${n.replace(/^  /,"&nbsp;&nbsp;↳ ")}</td><td>${b.eligible}</td><td>${ci(b.uptake)}</td><td>${ci(b.verbalized)}</td></tr>`).join("");
+  const mo=r.monitors;
+  tMon.innerHTML=`<tr><th>Monitor</th><th>Recall: unfaithful uptake</th><th>Recall: verbalised uptake</th><th>Flag rate: hint ignored</th><th>Flag rate: no hint</th></tr>`+
+    [["Keyword regex","kw"],["LLM monitor (flash-lite)","llm_mon"]].map(([n,k])=>`<tr><td>${n}</td><td>${ci(mo[k].unfaithful_uptake)}</td><td>${ci(mo[k].faithful_uptake)}</td><td>${ci(mo[k].hint_ignored)}</td><td>${ci(mo[k].no_hint_baseline)}</td></tr>`).join("");
+}
+function list(){
+  const t=fText.value.toLowerCase();
+  const f=C.filter(c=>(!fModel.value||c.model==fModel.value)&&(!fHint.value||c.hint==fHint.value)&&(!fLabel.value||c.label==fLabel.value)&&(!fUp.value||String(c.uptake)==fUp.value)&&(!t||(c.question+c.reasoning).toLowerCase().includes(t)));
+  count.textContent=`${f.length} cases`+(f.length>60?" (showing 60)":"");
+  cases.innerHTML=f.slice(0,60).map(c=>{
+    const lc=c.label=="verbalized"?"ok":c.label=="mentioned_dismissed"?"warn":"bad";
+    return `<div class="case"><div class="meta"><span class="tag">${c.model}</span><span class="tag">${c.hint}</span><span class="tag">${c.source}</span>
+    <span class="tag ${c.uptake?"bad":""}">${c.uptake?"took hint":"no uptake"}</span><span class="tag ${lc}">judge: ${c.label}</span>
+    <span class="tag">kw monitor: ${c.kw?"flag":"–"}</span><span class="tag">LLM monitor: ${c.llm_mon==null?"n/a":c.llm_mon?"flag":"–"}</span></div>
+    <div>${esc(c.question)}</div><div class="muted" style="font-size:.9rem">${c.options.map((o,i)=>`(${"ABCD"[i]}) ${esc(o)}`).join(" · ")}</div>
+    <div style="font-size:.9rem;margin-top:4px">correct <b>${c.answer}</b> · hint → <b>${c.target}</b> · no-hint answer <b>${c.base_pred??"?"}</b> · hinted answer <b>${c.pred??"?"}</b></div>
+    <details><summary>reasoning</summary><pre>${esc(c.reasoning).replace(KW,s=>`<mark>${s}</mark>`)}</pre></details></div>`}).join("");
+}
+</script>
+</body>
+</html>
