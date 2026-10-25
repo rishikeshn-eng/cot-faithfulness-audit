@@ -16,29 +16,36 @@
 .case>div:nth-child(2){font-size:16px}
 #more{margin:8px 0 0}
 </style>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600..800&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style id="theme">
-:root:root:root{--bg:#FFF1EC;--surface:#FFFFFF;--surface-2:#FCE3DC;--ink:#1B1A55;--ink-2:#2F2D70;--muted:#55538A;--line:rgba(27,26,85,.14);--line-2:rgba(27,26,85,.26);--dye:#D4006E;--dye-dark:#D4006E;--on-dye:#FFFFFF;--dye-soft:rgba(212,0,110,.12);--link:#0057A8;--blk:#0057A8;--blk-ink:#FFFFFF;--c1:#0057A8;--c2:#D4006E;--c3:#00866E;--c4:#B86E00;--c5:#6B3FA0;--c6:#55538A;--good:#00866E;--bad:#D4006E;--warn:#B86E00;--display:'Instrument Serif',Georgia,serif;--h1-w:400;--h1-ls:-.01em;--plate-filter:none;--tex:radial-gradient(rgba(212,0,110,.16) 1.1px,transparent 1.7px) 0 0/8px 8px,radial-gradient(rgba(0,87,168,.10) 1.1px,transparent 1.7px) 4px 4px/8px 8px;--grain:.07;--color-scheme:light;}
-body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--tex);opacity:var(--tex-o,1)}
-body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:220px;opacity:var(--grain,.08);mix-blend-mode:overlay}
-.labbar{background:var(--blk);border-bottom:0;-webkit-backdrop-filter:none;backdrop-filter:none}
-.labbar .home,.labbar nav a,.labbar nav a.gh{color:var(--blk-ink)}
-.labbar nav a:hover{background:color-mix(in srgb,var(--blk-ink) 14%,transparent);color:var(--blk-ink)}
-.labbar .home i{background:var(--blk-ink);color:var(--blk)}
-h1,h2,h3,.readout,.verdict,.kpi b,.stat b,.tile .v,.stat .v{font-family:var(--display)}
-h1{font-size:clamp(38px,6.2vw,72px);line-height:1.02;letter-spacing:var(--h1-ls,-.02em);font-weight:var(--h1-w,800);max-width:18ch}
-.seal{background:var(--dye);color:var(--on-dye);border-color:var(--dye);box-shadow:6px 6px 0 var(--ink)}
-.kpis,.stats,.tiles,#headline.grid{background:var(--blk);border:0;gap:0;border-radius:var(--r);box-shadow:8px 8px 0 var(--ink)}
-.kpi,.stat,.tile,#headline .stat{background:transparent;border-left:1px solid color-mix(in srgb,var(--blk-ink) 22%,transparent)}
-.kpi b,.stat b,.tile .v,.stat .v,.kpi:first-child b,.stat:first-child b,.tile:first-child .v,#headline .stat:first-child .v{color:var(--blk-ink)}
-.kpi span,.stat span,.tile .l,.stat .k{color:color-mix(in srgb,var(--blk-ink) 85%,transparent)}
-.lab-panel{border:2px solid var(--ink);border-top:10px solid var(--dye);box-shadow:8px 8px 0 var(--ink)}
-.seg{background:color-mix(in srgb,var(--ink) 9%,transparent)}
+:root:root:root{--bg:#F0F7FF;--surface:#FFFFFF;--surface-2:#D8E9FF;--ink:#1C1B22;--ink-2:#3E3D49;--muted:#5D5C6B;--line:rgba(28,27,34,.12);--line-2:rgba(28,27,34,.22);--dye:#3057A3;--dye-dark:#3057A3;--on-dye:#FFFFFF;--link:#3057A3;--fill:#77A4F6;--deep:#162644;--glow:#9DC4FF;--tint:#D8E9FF;--tex:linear-gradient(#77A4F633 1px,transparent 1px) 0 0/100% 30px;--plate-filter:none;--color-scheme:light;--display:'Bricolage Grotesque',system-ui,sans-serif;--c1:#3057A3;--c2:#96372F;--c3:#006E30;--c4:#844C00;--c5:#6C4494;--c6:#5D5C6B}
+@media (prefers-color-scheme:dark){:root:root:root:not([data-theme=light]){--bg:#162644;--surface:#213459;--surface-2:color-mix(in srgb,#213459 70%,#9DC4FF 12%);--ink:#F4F2F7;--ink-2:#DAD7E3;--muted:#BDBACB;--line:rgba(244,242,247,.12);--line-2:rgba(244,242,247,.24);--dye:#9DC4FF;--dye-dark:#9DC4FF;--on-dye:#162644;--link:#9DC4FF;--tint:#213459;--tex:linear-gradient(#9DC4FF1F 1px,transparent 1px) 0 0/100% 30px;--plate-filter:brightness(.92);--color-scheme:dark;--c1:#9DC4FF;--c2:#FFA89C;--c3:#8FD89E;--c4:#EEBA70;--c5:#D5B2FE;--c6:#BDBACB}}
+:root:root:root[data-theme=dark]{--bg:#162644;--surface:#213459;--surface-2:color-mix(in srgb,#213459 70%,#9DC4FF 12%);--ink:#F4F2F7;--ink-2:#DAD7E3;--muted:#BDBACB;--line:rgba(244,242,247,.12);--line-2:rgba(244,242,247,.24);--dye:#9DC4FF;--dye-dark:#9DC4FF;--on-dye:#162644;--link:#9DC4FF;--tint:#213459;--tex:linear-gradient(#9DC4FF1F 1px,transparent 1px) 0 0/100% 30px;--plate-filter:brightness(.92);--color-scheme:dark;}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--tex);-webkit-mask-image:linear-gradient(180deg,#000,transparent 70%);mask-image:linear-gradient(180deg,#000,transparent 70%)}
+@media (prefers-reduced-motion:no-preference){body::before{animation:drift 90s linear infinite}@keyframes drift{to{background-position:240px 120px,120px 240px}}}
+.labbar{background:var(--deep);border-bottom:0}
+.labbar .home,.labbar nav a,.labbar nav a.gh{color:#fff}
+.labbar nav a:hover{background:rgba(255,255,255,.12);color:#fff}
+.labbar .home i{background:var(--fill);color:var(--deep)}
+h1,h2,h3,.readout,.verdict,.kpi b,.stat b,.tile .v,.stat .v,.lab-panel .ph h2{font-family:var(--display);letter-spacing:-.025em}
+h1{font-size:clamp(36px,5.6vw,64px);line-height:1.05;font-weight:800;max-width:19ch}
+h2{font-weight:800}
+.eyebrow{color:var(--dye)}
+.seal{background:var(--fill);color:var(--deep);border:0;border-radius:22px;box-shadow:0 24px 50px -24px var(--deep);font-family:"Shippori Mincho B1",serif}
+.seal small{color:var(--muted)}
+.plain{display:grid;grid-template-columns:auto 1fr;gap:14px 18px;align-items:start;margin:22px 0 8px;max-width:760px;background:var(--tint);border-radius:18px;padding:18px 22px}
+.plain b{font:600 11px/1.6 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--dye);white-space:nowrap;padding-top:3px}
+.plain p{margin:0;font-size:18px;line-height:1.55;color:var(--ink)}
+@media (max-width:600px){.plain{grid-template-columns:1fr}}
+.kpis,.stats,.tiles,#headline.grid{background:var(--deep);border:0;gap:0;border-radius:20px;box-shadow:0 30px 60px -36px var(--deep)}
+.kpi,.stat,.tile,#headline .stat{background:transparent;border-left:1px solid rgba(255,255,255,.12)}
+.kpi b,.stat b,.tile .v,.stat .v{color:#fff}
+.kpi:first-child b,.stat:first-child b,.tile:first-child .v,#headline .stat:first-child .v{color:var(--glow)}
+.kpi span,.stat span,.tile .l,.stat .k{color:rgba(255,255,255,.82)}
+.lab-panel{border:0;border-top:6px solid var(--fill);border-radius:20px;box-shadow:0 30px 60px -40px var(--deep)}
 .seg button[aria-pressed="true"]{background:var(--dye);color:var(--on-dye);box-shadow:none}
-.track{background:color-mix(in srgb,var(--ink) 12%,transparent)}
-.card,.panel,.case,.tbl,.tablewrap,figure{border-color:color-mix(in srgb,var(--ink) 22%,transparent)}
-button.primary{box-shadow:4px 4px 0 var(--ink)}
-h1{text-shadow:4px 3px 0 rgba(212,0,110,.55);font-style:italic}h2{text-shadow:2px 2px 0 rgba(212,0,110,.35)}
+.card,.panel,.case,figure,.tbl,.tablewrap{border-radius:16px}
+button.primary{background:var(--dye);border-color:var(--dye);color:var(--on-dye)}
 </style>
 </head>
 <body>
@@ -48,6 +55,7 @@ h1{text-shadow:4px 3px 0 rgba(212,0,110,.55);font-style:italic}h2{text-shadow:2p
 <div class="eyebrow">Chain-of-thought monitorability</div>
 <h1>Do reasoning models say when they use a hint?</h1>
 <p class="lede">A reproducible hint-injection benchmark for chain-of-thought faithfulness: 4,000 questions (MMLU, ARC-Challenge, GSM8K) × 5 hint types, run on Gemini thinking models (with thought summaries) and a local Qwen2.5-1.5B-Instruct. When a model switches its answer to the hinted option, how often does its visible reasoning admit the hint was used?</p>
+<aside class="plain"><b>In plain words</b><p>AI models can “show their working”. We slipped them a hint and checked: they used it, then usually wrote out reasoning that never mentions it.</p></aside>
 <div class="kpis" id="kpis"></div>
 <section class="lab-panel" id="explore" aria-labelledby="explore-h">
   <div class="ph"><h2 id="explore-h">Out of 100 questions, who takes the hint and who admits it?</h2><span class="eyebrow">Explore</span></div>
