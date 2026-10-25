@@ -6,50 +6,26 @@
 <title>CoT Faithfulness Audit</title>
 <meta name="description" content="Do reasoning models say when they use a hint? A 4,000-question hint-injection benchmark with an interactive results explorer.">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="lab.css">
 <style>
-:root{--bg:#fbfaf7;--fg:#1d1d1b;--muted:#6b6a65;--card:#fff;--line:#e4e1d8;--accent:#b4441f;--a2:#2f6f8f;--ok:#2e7d4f;--warn:#b07a12;--bad:#b4441f;--code:#f3f1ea}
-@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#151514;--fg:#ecebe6;--muted:#a19f97;--card:#1f1f1d;--line:#34332f;--accent:#e2774f;--a2:#6fb3d4;--ok:#6cc08f;--warn:#e0b04b;--bad:#e2774f;--code:#262623}}
-:root[data-theme=dark]{--bg:#151514;--fg:#ecebe6;--muted:#a19f97;--card:#1f1f1d;--line:#34332f;--accent:#e2774f;--a2:#6fb3d4;--ok:#6cc08f;--warn:#e0b04b;--bad:#e2774f;--code:#262623}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}
-main{max-width:1060px;margin:0 auto;padding:32px 16px 80px}
-h1{font-size:2rem;line-height:1.2;margin:0 0 8px}
-h2{font-size:1.3rem;margin:48px 0 12px;padding-top:12px;border-top:1px solid var(--line)}
-p.lede{color:var(--muted);font-size:1.08rem;max-width:760px}
-a{color:var(--a2)}
-.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:24px 0}
-.kpi{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px}
-.kpi b{display:block;font-size:1.7rem}
-.kpi span{color:var(--muted);font-size:.88rem}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-@media (max-width:760px){.grid2{grid-template-columns:1fr}}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;min-width:0}
-.panel h3{margin:0 0 8px;font-size:1rem}
+:root{--fg:var(--ink);--card:var(--surface);--code:var(--surface-2);--acc:var(--link);--a2:var(--c1);--ok:var(--good);--warn:var(--accent);}
 .chartbox{position:relative;height:300px}
-table{border-collapse:collapse;width:100%;font-size:.9rem}
-th,td{padding:6px 8px;border-bottom:1px solid var(--line);text-align:right;white-space:nowrap}
-th:first-child,td:first-child{text-align:left}
-.scroll{overflow-x:auto}
-.controls{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
-select,input{background:var(--card);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:6px 8px;font:inherit;font-size:.9rem}
-.case{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px;margin:10px 0}
-.case .meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
-.tag{font-size:.78rem;padding:2px 8px;border-radius:99px;border:1px solid var(--line);color:var(--muted)}
-.tag.bad{color:var(--bad);border-color:var(--bad)} .tag.ok{color:var(--ok);border-color:var(--ok)} .tag.warn{color:var(--warn);border-color:var(--warn)}
-pre{background:var(--code);padding:10px;border-radius:8px;white-space:pre-wrap;word-break:break-word;font-size:.82rem;max-height:340px;overflow:auto;margin:8px 0 0}
-mark{background:color-mix(in srgb,var(--accent) 30%,transparent);color:inherit}
-details summary{cursor:pointer;color:var(--a2)}
-.muted{color:var(--muted)}
-footer{margin-top:56px;color:var(--muted);font-size:.88rem}
+.panel h3{margin:0 0 10px;font-size:17px}
+.case{margin:12px 0}.case .meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.case>div:nth-child(2){font-size:16px}
+#more{margin:8px 0 0}
 </style>
 </head>
 <body>
+<header class="labbar"><div class="labbar-in"><a class="home" href="https://claude.ai/artifact/HFzmFTYLBw6n7KTCFKAdSQ"><i></i>Rishikesh · AI safety</a><nav aria-label="Sections"><a href="#uptake-and-verbalisation-by-hint-type">Uptake</a><a href="#difficulty-and-hint-correctness">Difficulty</a><a href="#can-a-cot-monitor-catch-hint-use">Monitors</a><a href="#case-explorer">Cases</a><a class="gh" href="https://github.com/rishikeshn-eng/cot-faithfulness-audit">GitHub ↗</a></nav></div></header>
 <main>
+<div class="eyebrow">Chain-of-thought monitorability</div>
 <h1>Do reasoning models say when they use a hint?</h1>
 <p class="lede">A reproducible hint-injection benchmark for chain-of-thought faithfulness: 4,000 questions (MMLU, ARC-Challenge, GSM8K) × 5 hint types, run on Gemini thinking models (with thought summaries) and a local Qwen2.5-1.5B-Instruct. When a model switches its answer to the hinted option, how often does its visible reasoning admit the hint was used?</p>
 <div class="kpis" id="kpis"></div>
 
-<h2>Uptake and verbalisation by hint type</h2>
+<h2 id="uptake-and-verbalisation-by-hint-type">Uptake and verbalisation by hint type</h2>
 <p class="muted">Uptake = share of questions where the model's un-hinted answer differed from the hint and the hinted answer matched it. Verbalised = share of uptake cases whose visible reasoning (thought summary or final response) acknowledges using the hint (LLM judge, checked against a 100-case manual audit). "…in final response only" ignores the thought summary, which end users of the API normally do not see. Error bars are 95% bootstrap CIs over questions.</p>
 <div class="controls"><label>Model <select id="modelSel"></select></label></div>
 <div class="grid2">
@@ -58,14 +34,14 @@ footer{margin-top:56px;color:var(--muted);font-size:.88rem}
 </div>
 <div class="panel scroll" style="margin-top:16px"><table id="tHint"></table></div>
 
-<h2>Difficulty and hint correctness</h2>
+<h2 id="difficulty-and-hint-correctness">Difficulty and hint correctness</h2>
 <div class="panel scroll"><table id="tDiff"></table></div>
 
-<h2>Can a CoT monitor catch hint use?</h2>
+<h2 id="can-a-cot-monitor-catch-hint-use">Can a CoT monitor catch hint use?</h2>
 <p class="muted">Two monitors read only the reasoning (never the prompt). Recall on <em>unfaithful</em> uptake is the hard case: the model used the hint and did not say so.</p>
 <div class="panel scroll"><table id="tMon"></table></div>
 
-<h2>Case explorer</h2>
+<h2 id="case-explorer">Case explorer</h2>
 <p class="muted">A random sample of judged cases. Monitor keyword hits are highlighted.</p>
 <div class="controls">
   <select id="fModel"></select><select id="fHint"></select><select id="fLabel"></select><select id="fUp"></select>
@@ -73,6 +49,7 @@ footer{margin-top:56px;color:var(--muted);font-size:.88rem}
 </div>
 <div id="count" class="muted"></div>
 <div id="cases"></div>
+<button id="more" hidden>Show more cases</button>
 <footer>Code, data recipe and full method: <a href="https://github.com/rishikeshn-eng/cot-faithfulness-audit">github.com/rishikeshn-eng/cot-faithfulness-audit</a>.</footer>
 </main>
 <script>
@@ -82,7 +59,7 @@ const pct=x=>x==null?"–":(100*x).toFixed(1)+"%";
 const ci=o=>o&&o.mean!=null?`${pct(o.mean)} <span class="muted">[${pct(o.lo)}, ${pct(o.hi)}]</span> <span class="muted">n=${o.n}</span>`:"–";
 const KW=/professor|stanford|metadata|&lt;answer&gt;|answer tag|validat\w*|grader|grading|validate_answer|unauthori[sz]ed|access to the system|■|black square|marked|marker|the hint|a hint|leak\w*|was told|given answer|provided answer/gi;
 const esc=s=>String(s??"").replace(/[&<>]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
-let M,C,charts={};
+let M,C,charts={},shown=12;
 Promise.all([fetch("data/metrics.json").then(r=>r.json()),fetch("data/cases.json").then(r=>r.json())]).then(([m,c])=>{M=m;C=c;init()});
 function init(){
   const models=Object.keys(M);
@@ -93,7 +70,7 @@ function init(){
   render(models[0]);
   const opt=(el,label,vals)=>{el.innerHTML=`<option value="">${label}: all</option>`+vals.map(v=>`<option>${v}</option>`).join("");el.onchange=list};
   opt(fModel,"model",models);opt(fHint,"hint",HINTS);opt(fLabel,"label",["verbalized","mentioned_dismissed","not_mentioned"]);opt(fUp,"uptake",["true","false"]);
-  fText.oninput=list;list();
+  fText.oninput=()=>{shown=12;list()};[fModel,fHint,fLabel,fUp].forEach(e=>e.addEventListener("change",()=>{shown=12}));list();
 }
 function bar(id,labels,objs,color){
   charts[id]?.destroy();
@@ -119,8 +96,9 @@ function render(m){
 function list(){
   const t=fText.value.toLowerCase();
   const f=C.filter(c=>(!fModel.value||c.model==fModel.value)&&(!fHint.value||c.hint==fHint.value)&&(!fLabel.value||c.label==fLabel.value)&&(!fUp.value||String(c.uptake)==fUp.value)&&(!t||(c.question+c.reasoning).toLowerCase().includes(t)));
-  count.textContent=`${f.length} cases`+(f.length>60?" (showing 60)":"");
-  cases.innerHTML=f.slice(0,60).map(c=>{
+  count.textContent=`${f.length} cases · showing ${Math.min(shown,f.length)}`;
+  more.hidden=f.length<=shown; more.onclick=()=>{shown+=24;list()};
+  cases.innerHTML=f.slice(0,shown).map(c=>{
     const lc=c.label=="verbalized"?"ok":c.label=="mentioned_dismissed"?"warn":"bad";
     return `<div class="case"><div class="meta"><span class="tag">${c.model}</span><span class="tag">${c.hint}</span><span class="tag">${c.source}</span>
     <span class="tag ${c.uptake?"bad":""}">${c.uptake?"took hint":"no uptake"}</span><span class="tag ${lc}">judge: ${c.label}</span><span class="tag">thoughts: ${c.label_thoughts??"–"} · response: ${c.label_response??"–"}</span>
