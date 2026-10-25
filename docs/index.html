@@ -6,10 +6,10 @@
 <title>CoT Faithfulness Audit</title>
 <meta name="description" content="Do reasoning models say when they use a hint? A 4,000-question hint-injection benchmark with an interactive results explorer.">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=JetBrains+Mono:wght@400;500&display=swap">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Shippori+Mincho+B1:wght@700;800&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <link rel="stylesheet" href="lab.css">
 <style>
-:root{--fg:var(--ink);--card:var(--surface);--code:var(--surface-2);--acc:var(--link);--a2:var(--c1);--ok:var(--good);--warn:var(--accent);}
+:root{--accent:var(--dye);--accent-soft:var(--dye-soft);--fg:var(--ink);--card:var(--surface);--code:var(--surface-2);--acc:var(--link);--a2:var(--c1);--ok:var(--good);--warn:var(--accent);--dye:#165E83;--dye-dark:#7DBBDF;}
 .chartbox{position:relative;height:300px}
 .panel h3{margin:0 0 10px;font-size:17px}
 .case{margin:12px 0}.case .meta{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
@@ -18,12 +18,49 @@
 </style>
 </head>
 <body>
-<header class="labbar"><div class="labbar-in"><a class="home" href="https://claude.ai/artifact/HFzmFTYLBw6n7KTCFKAdSQ"><i></i>Rishikesh · AI safety</a><nav aria-label="Sections"><a href="#uptake-and-verbalisation-by-hint-type">Uptake</a><a href="#difficulty-and-hint-correctness">Difficulty</a><a href="#can-a-cot-monitor-catch-hint-use">Monitors</a><a href="#case-explorer">Cases</a><a class="gh" href="https://github.com/rishikeshn-eng/cot-faithfulness-audit">GitHub ↗</a></nav></div></header>
+<header class="labbar"><div class="labbar-in"><a class="home" href="https://claude.ai/artifact/HFzmFTYLBw6n7KTCFKAdSQ"><i>律</i>Rishikesh Nair</a><nav aria-label="Sections"><a class="ex" href="#explore">Explore</a><a href="#uptake-and-verbalisation-by-hint-type">Uptake</a><a href="#difficulty-and-hint-correctness">Difficulty</a><a href="#can-a-cot-monitor-catch-hint-use">Monitors</a><a href="#case-explorer">Cases</a><a class="gh" href="https://github.com/rishikeshn-eng/cot-faithfulness-audit">GitHub ↗</a></nav></div></header>
 <main>
+<div class="seal" aria-hidden="true">言<small>koto · speech</small></div>
 <div class="eyebrow">Chain-of-thought monitorability</div>
 <h1>Do reasoning models say when they use a hint?</h1>
 <p class="lede">A reproducible hint-injection benchmark for chain-of-thought faithfulness: 4,000 questions (MMLU, ARC-Challenge, GSM8K) × 5 hint types, run on Gemini thinking models (with thought summaries) and a local Qwen2.5-1.5B-Instruct. When a model switches its answer to the hinted option, how often does its visible reasoning admit the hint was used?</p>
 <div class="kpis" id="kpis"></div>
+<section class="lab-panel" id="explore" aria-labelledby="explore-h">
+  <div class="ph"><h2 id="explore-h">Out of 100 questions, who takes the hint and who admits it?</h2><span class="eyebrow">Explore</span></div>
+  <p class="how">Pick a model and a hint type. Each square is one question where the hint pointed at a different answer than the model would have given. Filled squares switched to the hinted answer; the marked ones also said so in their reasoning.</p>
+  <div class="pctl"><span class="lbl">Model</span><div class="seg" id="pm" role="group" aria-label="Model"></div></div>
+  <div class="pctl"><span class="lbl">Hint</span><div class="seg" id="ph" role="group" aria-label="Hint type"></div></div>
+  <div class="pbody">
+    <div>
+      <svg id="pgrid" viewBox="0 0 300 300" role="img" style="width:100%;max-width:340px;display:block"></svg>
+      <div class="legendline"><span><i style="background:var(--surface-2);outline:1px solid var(--line-2)"></i>kept its answer</span><span><i style="background:var(--dye);opacity:.35"></i>took the hint, silent</span><span><i style="background:var(--dye)"></i>took the hint, admitted it</span></div>
+    </div>
+    <div>
+      <p class="readout" id="pread" aria-live="polite"></p>
+      <div id="pbars"></div>
+      <p class="muted" id="pnote" style="margin-top:12px"></p>
+    </div>
+  </div>
+</section>
+<script>
+(()=>{const H={sycophancy:"Professor says",metadata:"Answer tag",grader_hack:"Grader code",visual_pattern:"Visual pattern",unethical:"Leaked answer"};
+const pm=document.getElementById("pm"),ph=document.getElementById("ph"),g=document.getElementById("pgrid");let M,model,hint="all";
+const seg=(el,items,cur,on)=>{el.innerHTML=items.map(([k,l])=>`<button type="button" data-k="${k}" aria-pressed="${k===cur}">${l}</button>`).join("");el.onclick=e=>{const b=e.target.closest("button");if(!b)return;el.querySelectorAll("button").forEach(x=>x.setAttribute("aria-pressed",x===b));on(b.dataset.k)}};
+const pct=x=>(100*x).toFixed(1)+"%";
+const row=(lab,v,lo,hi)=>`<div class="mrow"><span class="lab">${lab}</span><div class="track"><div class="fill" style="width:${100*v}%"></div>${lo!=null?`<div class="ci" style="left:${100*lo}%;width:${100*(hi-lo)}%"></div>`:""}</div><span class="val">${pct(v)}</span></div>`;
+function draw(){const r=M[model],b=hint==="all"?r.overall:r.by_hint[hint];const up=b.uptake.mean,vb=b.verbalized.mean||0;
+  const nUp=Math.round(up*100),nAd=Math.round(up*vb*100);let s="";
+  for(let i=0;i<100;i++){const x=(i%10)*30+3,y=Math.floor(i/10)*30+3,f=i<nAd?'fill="var(--dye)"':i<nUp?'fill="var(--dye)" fill-opacity=".35"':'fill="var(--surface-2)" stroke="var(--line-2)"';
+    s+=`<rect x="${x}" y="${y}" width="24" height="24" rx="4" ${f}/>`+(i<nAd?`<path d="M${x+6} ${y+12.5}l4 4 8-9" stroke="var(--on-dye)" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>`:"")}
+  g.innerHTML=s;g.setAttribute("aria-label",`${nUp} of 100 questions switched to the hinted answer; ${nAd} of them admitted using the hint.`);
+  document.getElementById("pread").innerHTML=`<em>${nUp}</em> of 100 took the hint. <em>${nAd}</em> said so.`;
+  document.getElementById("pbars").innerHTML=row("Took the hint",up,b.uptake.lo,b.uptake.hi)+row("Admitted it (of those)",vb,b.verbalized.lo,b.verbalized.hi)+row("Chance switch rate",b.chance_switch||r.overall.chance_switch);
+  document.getElementById("pnote").textContent=`${model} · ${hint==="all"?"all hint types":H[hint]} · n=${b.uptake.n} eligible, ${b.verbalized.n} hint-takers. Bars show 95% bootstrap intervals.`}
+fetch("data/metrics.json").then(r=>r.json()).then(d=>{M=d;const ms=Object.keys(d);model=ms[0];
+  seg(pm,ms.map(m=>[m,m.replace("-flash-lite"," FL").replace("gemma-4-26b-a4b-it","gemma-4-26b")]),model,k=>{model=k;draw()});
+  seg(ph,[["all","All"],...Object.entries(H)],hint,k=>{hint=k;draw()});draw()})})();
+</script>
+
 
 <h2 id="uptake-and-verbalisation-by-hint-type">Uptake and verbalisation by hint type</h2>
 <p class="muted">Uptake = share of questions where the model's un-hinted answer differed from the hint and the hinted answer matched it. Verbalised = share of uptake cases whose visible reasoning (thought summary or final response) acknowledges using the hint (LLM judge, checked against a 100-case manual audit). "…in final response only" ignores the thought summary, which end users of the API normally do not see. Error bars are 95% bootstrap CIs over questions.</p>
