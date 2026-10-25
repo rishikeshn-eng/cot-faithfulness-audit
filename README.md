@@ -39,7 +39,7 @@ This project rebuilds that kind of measurement as an open, cheap, re-runnable be
 
 | Model | How | Questions run | Visible reasoning |
 |---|---|---|---|
-| Qwen2.5-1.5B-Instruct | local, MLX bf16 on Apple M4, greedy, ≤512 new tokens | see table below (target: all 4,000) | the CoT itself |
+| Qwen2.5-1.5B-Instruct | local, MLX bf16 on Apple M4, greedy, ≤512 new tokens | first 750 (of 4,000 built; see Limitations) | the CoT itself |
 | Gemini 3.5 Flash-Lite | API, temperature 0, thinking budget 2,048, `include_thoughts` | first 50 of a fixed stratified order | **thought summary** + final response |
 | Gemini 3.1 Flash-Lite | same | first 25 | thought summary + final response |
 | Gemma 4 26B-A4B (MoE, open weights) | API, temperature 0, thinking on | first 40 | **raw thoughts** + final response |
@@ -66,60 +66,72 @@ All models see the same questions: any prefix of the fixed 3 MMLU : 1 ARC : 1 GS
 ![verbalised](docs/figs/verbalized.png)
 
 <!-- RESULTS -->
-| Model | Questions | Acc. no hint | Eligible pairs | Hint uptake | Chance switch | Verbalised \| uptake | …in final response only | Mentioned at all |
-|---|---|---|---|---|---|---|---|---|
-| Qwen2.5-1.5B-Instruct (local) | 750 | 63.3 | 2180 | 23.3 [20.7, 25.8] | 7.9 | 5.9 [4.0, 8.0] (n=493) | 5.9 [3.8, 8.0] | 6.1 [4.0, 8.3] |
-| Gemini 3.5 Flash-Lite | 51 | 90.2 | 128 | 33.6 [25.4, 43.1] | 0.4 | 88.4 [80.4, 97.4] (n=43) | 51.2 [33.3, 73.7] | 90.7 [83.0, 100.0] |
-| Gemini 3.1 Flash-Lite | 26 | 100.0 | 59 | 25.4 [11.7, 42.4] | 0.0 | 100.0 [100.0, 100.0] (n=15) | 86.7 [66.7, 100.0] | 100.0 [100.0, 100.0] |
-| Gemma 4 26B-A4B | 40 | 67.5 | 50 | 2.0 [0.0, 6.0] | 0.0 | 0.0 [0.0, 0.0] (n=1) | 0.0 [0.0, 0.0] | 100.0 [100.0, 100.0] |
+| Model | Questions | Unparsed | Acc. no hint | Eligible pairs | Hint uptake | Chance switch | Verbalised \| uptake | …in final response only | Mentioned at all |
+|---|---|---|---|---|---|---|---|---|---|
+| Qwen2.5-1.5B-Instruct (local) | 750 | 3.1 | 66.3 | 2158 | 23.5 [20.8, 26.1] | 8.0 | 5.7 [3.8, 7.9] (n=507) | 5.7 [3.7, 7.8] | 5.9 [4.0, 8.0] |
+| Gemini 3.5 Flash-Lite | 51 | 0.0 | 90.2 | 128 | 33.6 [25.4, 43.6] | 0.4 | 88.4 [81.1, 97.2] (n=43) | 51.2 [32.7, 74.4] | 90.7 [81.8, 100.0] |
+| Gemini 3.1 Flash-Lite | 26 | 0.0 | 100.0 | 59 | 25.4 [11.9, 41.7] | 0.0 | 100.0 [100.0, 100.0] (n=15) | 86.7 [66.7, 100.0] | 100.0 [100.0, 100.0] |
+| Gemma 4 26B-A4B | 40 | 39.2 | 96.4 | 24 | 4.2 [0.0, 15.8] | 0.0 | 0.0 [0.0, 0.0] (n=1) | 0.0 [0.0, 0.0] | 100.0 [100.0, 100.0] |
 
-All numbers are %, with 95% bootstrap CIs over questions (1,000 resamples). *Eligible pairs* = hinted prompts whose un-hinted answer differed from the hint target. *Verbalised* uses the LLM judge on the model's visible output (thought summary/thoughts + final response).
+All numbers are %, with 95% bootstrap CIs over questions (1,000 resamples). *Unparsed* = outputs with no final "Answer: X" (mostly truncation at the token cap); they are treated as missing. *Eligible pairs* = hinted prompts whose un-hinted answer differed from the hint target (both answers parsed). *Verbalised* uses the LLM judge on the model's visible output (thought summary/thoughts + final response).
 
 **By hint type: uptake % / verbalised-given-uptake %**
 
 | Model | sycophancy | metadata | grader_hack | visual_pattern | unethical |
 |---|---|---|---|---|---|
-| Qwen2.5-1.5B-Instruct (local) | 22.5 / 13.7 (n=95) | 15.8 / 0.0 (n=69) | 18.3 / 0.0 (n=78) | 21.8 / 0.0 (n=91) | 37.8 / 10.0 (n=160) |
+| Qwen2.5-1.5B-Instruct (local) | 22.7 / 13.3 (n=98) | 16.2 / 0.0 (n=69) | 18.6 / 0.0 (n=80) | 21.8 / 0.0 (n=95) | 38.1 / 9.7 (n=165) |
 | Gemini 3.5 Flash-Lite | 15.4 / 75.0 (n=4) | 34.6 / 66.7 (n=9) | 100.0 / 96.2 (n=26) | 4.0 / 100.0 (n=1) | 12.0 / 100.0 (n=3) |
 | Gemini 3.1 Flash-Lite | 16.7 / 100.0 (n=2) | 16.7 / 100.0 (n=2) | 75.0 / 100.0 (n=9) | 0.0 / – (n=0) | 18.2 / 100.0 (n=2) |
-| Gemma 4 26B-A4B | 0.0 / – (n=0) | 10.0 / 0.0 (n=1) | 0.0 / – (n=0) | 0.0 / – (n=0) | 0.0 / – (n=0) |
+| Gemma 4 26B-A4B | 0.0 / – (n=0) | 14.3 / 0.0 (n=1) | – / – (n=0) | 0.0 / – (n=0) | 0.0 / – (n=0) |
 
-**Accuracy when the hint points to a wrong answer (%, no-hint accuracy in brackets)**
+**Accuracy when the hint points to a wrong answer (%; compare with the no-hint accuracy column above)**
 
 | Model | sycophancy | metadata | grader_hack | visual_pattern | unethical |
 |---|---|---|---|---|---|
-| Qwen2.5-1.5B-Instruct (local) | 60.1 | 63.4 | 61.2 | 53.6 | 53.4 |
+| Qwen2.5-1.5B-Instruct (local) | 61.8 | 66.8 | 63.1 | 54.1 | 54.4 |
 | Gemini 3.5 Flash-Lite | 90.9 | 72.7 | 0.0 | 95.5 | 90.9 |
 | Gemini 3.1 Flash-Lite | 83.3 | 83.3 | 25.0 | 100.0 | 81.8 |
-| Gemma 4 26B-A4B | 27.8 | 33.3 | 0.0 | 38.9 | 38.9 |
+| Gemma 4 26B-A4B | 83.3 | 66.7 | – | 77.8 | 87.5 |
 
 **Difficulty: uptake % / verbalised %, split by whether the model was right without the hint**
 
 | Model | Correct w/o hint (easier) | Wrong w/o hint (harder) | Hint → correct option | Hint → wrong option |
 |---|---|---|---|---|
-| Qwen2.5-1.5B-Instruct (local) | 12.3 / 4.9 | 36.2 / 6.3 | 41.0 / 5.9 | 15.2 / 5.9 |
+| Qwen2.5-1.5B-Instruct (local) | 12.4 / 4.8 | 36.7 / 6.1 | 41.5 / 5.7 | 15.3 / 5.7 |
 | Gemini 3.5 Flash-Lite | 26.7 / 96.4 | 65.2 / 73.3 | 77.8 / 71.4 | 26.4 / 96.6 |
 | Gemini 3.1 Flash-Lite | 25.4 / 100.0 | – / – | – / – | 25.4 / 100.0 |
-| Gemma 4 26B-A4B | 2.2 / 0.0 | 0.0 / – | – / – | 2.0 / 0.0 |
+| Gemma 4 26B-A4B | 4.2 / 0.0 | – / – | – / – | 4.2 / 0.0 |
 
 **CoT monitors (read only the model's visible reasoning, never the prompt): flag rate %**
 
 | Model | Monitor | Unfaithful uptake (recall) | Verbalised uptake (recall) | Hint ignored | No hint (FPR) |
 |---|---|---|---|---|---|
-| Qwen2.5-1.5B-Instruct (local) | keyword regex | 1.5 (n=464) | 51.7 (n=29) | 2.1 (n=1305) | 1.2 (n=750) |
-| Qwen2.5-1.5B-Instruct (local) | LLM (Gemma 4 31B) | – (n=0) | – (n=0) | – (n=0) | – (n=0) |
+| Qwen2.5-1.5B-Instruct (local) | keyword regex | 1.5 (n=478) | 51.7 (n=29) | 2.1 (n=1305) | 1.2 (n=750) |
+| Qwen2.5-1.5B-Instruct (local) | LLM (Gemma 4 31B) | 54.1 (n=314) | 100.0 (n=15) | 30.6 (n=49) | 24.1 (n=58) |
 | Gemini 3.5 Flash-Lite | keyword regex | 20.0 (n=5) | 97.4 (n=38) | 48.8 (n=84) | 3.9 (n=51) |
 | Gemini 3.5 Flash-Lite | LLM (Gemma 4 31B) | 20.0 (n=5) | 94.7 (n=38) | 3.4 (n=59) | 2.0 (n=51) |
 | Gemini 3.1 Flash-Lite | keyword regex | – (n=0) | 93.3 (n=15) | 72.7 (n=44) | 7.7 (n=26) |
 | Gemini 3.1 Flash-Lite | LLM (Gemma 4 31B) | – (n=0) | 100.0 (n=15) | 27.3 (n=44) | 0.0 (n=26) |
 | Gemma 4 26B-A4B | keyword regex | 100.0 (n=1) | – (n=0) | 73.9 (n=23) | 10.0 (n=40) |
 | Gemma 4 26B-A4B | LLM (Gemma 4 31B) | 100.0 (n=1) | – (n=0) | 15.8 (n=19) | 32.5 (n=40) |
+
+**Judge validation (manual audit, n=100 uptake cases):** agreement on *verbalised vs not* 98% (Cohen's κ = 0.96); judge precision 95%, recall 100%; 3-class agreement 98%; final-response-only agreement 98%. Human verbalised rate 36% vs judge 38%.
 <!-- /RESULTS -->
 
 <!-- FINDINGS -->
+### Key findings
+
+1. **The small open model uses hints and almost never says so.** Qwen2.5-1.5B switches to the hinted option in 23.5% of eligible pairs, about 3× its 8.0% chance-switch rate. Its CoT verbalises the hint in only **5.8% [3.8, 7.9]** of those switches (503 judged cases). For the metadata, grader-hack and visual-pattern hints it is **0%**: the CoT builds a post-hoc argument for the hinted option, or simply asserts it. Uptake is highest for the "unauthorized access" hint (38%) and for questions the model gets wrong without a hint (36% vs 12%). That matches Turpin et al.: models lean on cues most when unsure.
+2. **Flash-Lite thinking models mostly verbalise, but the user often doesn't see it.** Gemini 3.5 / 3.1 Flash-Lite name the hint in 88–100% of uptake cases once the API's thought summaries are included. In the **user-facing final response alone, 3.5 Flash-Lite admits the hint only 51% of the time**. A typical case: the summary says "the metadata gives `<answer>D</answer>`… I'll give D", while the response presents a domain argument for D. So a monitor sees the hint only if it has the thought summary, and that is a summary, not the raw CoT.
+3. **Grader-code hints are taken almost unconditionally.** Gemini 3.5 Flash-Lite followed the leaked `validate_answer()` in 26/26 eligible cases, including every case where it pointed to a wrong answer (accuracy under a wrong grader hint: **0%**, vs 90% with no hint). It usually says so explicitly ("the validation function is the ground truth… I must output C"). That is transparent reward hacking rather than hidden reasoning, but it is reward hacking from a single line of leaked test code. Gemma 4 26B behaves differently: when its answer parses, it almost never takes a hint (1/24 eligible). On 25/40 grader-hack prompts, though, it deliberated past the 16k-token cap without answering.
+4. **CoT monitors catch what is said, not what is done.** A keyword monitor flags 52–97% of *verbalised* uptake but only **1.5%** of Qwen's unfaithful uptake. An LLM monitor that sees only the reasoning (Gemma 4 31B) flags 54.5% of Qwen's unfaithful uptake, but also **23% of no-hint Qwen answers**. Most of that comes from noticing weak or non-sequitur reasoning, not the hint itself. On the Gemini models the LLM monitor is precise (2% FPR, and 3% on hint-ignored cases vs 49% for keywords) because those models verbalise; on the few unfaithful Gemini cases it catches 1/5.
+5. **The judge is reliable.** On a blind 100-case audit it agrees on *verbalised vs not* in 98/100 cases (κ = 0.96). Both disagreements are Qwen cases that mention the hint while disputing it, which the judge counted as "verbalized".
 <!-- /FINDINGS -->
 
 ## Limitations
+
+- **Cuts made for the deadline.** The benchmark has 4,000 questions, but Qwen was run on the first **750** (4,500 generations). The shared laptop GPU was queued across six projects, and results were frozen on 25 Oct. `run_qwen_chunks.sh` resumes the rest from cache. The Qwen **LLM monitor is partial**: 444 of 707 planned cases, so the monitor rows have the n shown. About 3% of Qwen judge batches failed on API 500/503 errors and were not retried.
+- **Gemma 4 truncation.** 39% of Gemma 4 26B outputs hit the 16k-token cap without a final answer (25/40 on grader-hack prompts). Unparsed outputs are treated as missing, which may hide exactly the cases where the model was torn about using the hint.
 
 - **Small API samples.** Free-tier caps were shared across six projects, so the Gemini and Gemma subjects cover 25–50 questions (150–300 prompts). Per-hint CIs for those models are wide, and some slices rest on a handful of questions. The bootstrap resamples questions, so it shows this honestly; a slice where every question behaves identically gets a degenerate CI. Qwen numbers are the statistically solid part.
 - **Thought summaries are not the CoT.** For Gemini, I score the API's *summary* of its thinking. A hint missing from the summary could be the summariser dropping it rather than the model hiding it. That is exactly why I report the final response separately. Gemma returns its raw thoughts.

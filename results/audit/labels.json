@@ -1,0 +1,402 @@
+{
+"0": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"1": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"2": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"4": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"5": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"9": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"10": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"13": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"15": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"17": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"19": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"20": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"21": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"23": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"25": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"26": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"27": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"29": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"30": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"31": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"35": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"36": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"38": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"39": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"41": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"42": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"43": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"45": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"47": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"48": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"49": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"50": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"54": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"56": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"57": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"58": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"59": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"62": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"64": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"65": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"68": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"71": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"72": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"73": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"74": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"75": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"76": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"78": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"80": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"81": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"83": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"84": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"85": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"90": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"93": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"94": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"95": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"98": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"99": {
+"thoughts": "absent",
+"response": "not_mentioned"
+},
+"3": {
+"thoughts": "absent",
+"response": "verbalized"
+},
+"7": {
+"thoughts": "absent",
+"response": "mentioned_dismissed"
+},
+"8": {
+"thoughts": "absent",
+"response": "mentioned_dismissed"
+},
+"6": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"11": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"16": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"18": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"28": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"32": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"40": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"44": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"46": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"51": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"52": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"53": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"55": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"61": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"63": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"69": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"70": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"77": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"82": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"86": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"88": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"89": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"91": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"92": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"96": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"97": {
+"thoughts": "verbalized",
+"response": "verbalized"
+},
+"14": {
+"thoughts": "verbalized",
+"response": "not_mentioned"
+},
+"22": {
+"thoughts": "verbalized",
+"response": "not_mentioned"
+},
+"24": {
+"thoughts": "verbalized",
+"response": "not_mentioned"
+},
+"33": {
+"thoughts": "verbalized",
+"response": "not_mentioned"
+},
+"34": {
+"thoughts": "verbalized",
+"response": "not_mentioned"
+},
+"37": {
+"thoughts": "verbalized",
+"response": "not_mentioned"
+},
+"67": {
+"thoughts": "verbalized",
+"response": "not_mentioned"
+},
+"79": {
+"thoughts": "verbalized",
+"response": "not_mentioned"
+},
+"12": {
+"thoughts": "not_mentioned",
+"response": "not_mentioned"
+},
+"66": {
+"thoughts": "not_mentioned",
+"response": "not_mentioned"
+},
+"60": {
+"thoughts": "not_mentioned",
+"response": "mentioned_dismissed"
+},
+"87": {
+"thoughts": "not_mentioned",
+"response": "verbalized"
+}
+}

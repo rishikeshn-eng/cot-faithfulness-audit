@@ -24,14 +24,15 @@ def n_questions(model):
 
 def render(M, audit):
     out = []
-    out.append("| Model | Questions | Acc. no hint | Eligible pairs | Hint uptake | Chance switch | Verbalised \\| uptake | …in final response only | Mentioned at all |")
-    out.append("|---|---|---|---|---|---|---|---|---|")
+    out.append("| Model | Questions | Unparsed | Acc. no hint | Eligible pairs | Hint uptake | Chance switch | Verbalised \\| uptake | …in final response only | Mentioned at all |")
+    out.append("|---|---|---|---|---|---|---|---|---|---|")
     for m, r in M.items():
         o = r["overall"]
-        out.append(f"| {LABEL.get(m, m)} | {n_questions(m)} | {p(r['accuracy']['none'])} | {o['eligible']} | {ci(o['uptake'])} | "
+        out.append(f"| {LABEL.get(m, m)} | {n_questions(m)} | {100 * r['parse_fail']:.1f} | {p(r['accuracy']['none'])} | {o['eligible']} | {ci(o['uptake'])} | "
                    f"{100 * o['chance_switch']:.1f} | {ci(o['verbalized'])} (n={o['verbalized']['n']}) | {ci(o['verbalized_response'])} | {ci(o['mentioned'])} |")
-    out.append("\nAll numbers are %, with 95% bootstrap CIs over questions (1,000 resamples). *Eligible pairs* = hinted prompts whose "
-               "un-hinted answer differed from the hint target. *Verbalised* uses the LLM judge on the model's visible output "
+    out.append("\nAll numbers are %, with 95% bootstrap CIs over questions (1,000 resamples). *Unparsed* = outputs with no final "
+               "\"Answer: X\" (mostly truncation at the token cap); they are treated as missing. *Eligible pairs* = hinted prompts "
+               "whose un-hinted answer differed from the hint target (both answers parsed). *Verbalised* uses the LLM judge on the model's visible output "
                "(thought summary/thoughts + final response).\n")
     out.append("**By hint type: uptake % / verbalised-given-uptake %**\n")
     out.append("| Model | " + " | ".join(HINT_TYPES) + " |")
@@ -39,7 +40,7 @@ def render(M, audit):
     for m, r in M.items():
         cells = [f"{p(r['by_hint'][h]['uptake'])} / {p(r['by_hint'][h]['verbalized'])} (n={r['by_hint'][h]['verbalized']['n']})" for h in HINT_TYPES]
         out.append(f"| {LABEL.get(m, m)} | " + " | ".join(cells) + " |")
-    out.append("\n**Accuracy when the hint points to a wrong answer (%, no-hint accuracy in brackets)**\n")
+    out.append("\n**Accuracy when the hint points to a wrong answer (%; compare with the no-hint accuracy column above)**\n")
     out.append("| Model | " + " | ".join(HINT_TYPES) + " |")
     out.append("|---|" + "---|" * len(HINT_TYPES))
     for m, r in M.items():

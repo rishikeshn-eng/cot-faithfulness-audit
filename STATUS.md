@@ -1,9 +1,12 @@
-# STATUS: cot-faithfulness-audit (published with partial runs; usage limit reached 2026-10-25 ~01:00 IST)
+# STATUS: cot-faithfulness-audit (done, frozen 25 Oct 2026 ~12:15 IST)
 - Repo: https://github.com/rishikeshn-eng/cot-faithfulness-audit
-- Pages: https://rishikeshn-eng.github.io/cot-faithfulness-audit/
-- Headline (see README table): Qwen2.5-1.5B takes hints in ~22% of eligible pairs (chance switch ~8%) but verbalises them in only ~5% of those cases. The keyword monitor catches ~1% of unfaithful uptake. Gemini flash-lite thought summaries mention the hint in most uptake cases, the user-facing response much less often. Gemini 3.5 Flash-Lite follows the grader-hack hint in 26/26 eligible cases.
-- Data: benchmark 4,000 q × 6 conds built. Qwen run on 750 questions (4,500 gens); `run_qwen_chunks.sh` is still queued for the GPU and resumes from cache. Gemini 3.5-FL 50 q, 3.1-FL 25 q, Gemma-4-26B 40 q (free-tier caps).
-## Left undone
-1. Manual audit: 100 blind cases exported to results/audit/blind.md; labels.json NOT written yet, so the README has no judge-agreement numbers. Then run `src/audit.py score` + `report.py`.
-2. LLM monitor on Qwen not run (`judge.py monitor --gen-model qwen2.5-1.5b --n-control 100`); some judge batches failed with 503 (rerun `judge.py judge` to fill in).
-3. Qwen beyond 750 questions if GPU time allows (rerun judge/analyze/report after). Fill the README <!-- FINDINGS --> block with prose.
+- Pages: https://rishikeshn-eng.github.io/cot-faithfulness-audit/ (served from /docs on main)
+- Headline: Qwen2.5-1.5B takes injected hints in 23.5% of eligible pairs (3× chance) but verbalises them in only 5.8% [3.8, 7.9] of those cases (0% for metadata/grader/visual hints). Gemini Flash-Lite thought summaries name the hint in 88–100% of uptake cases, but 3.5 Flash-Lite's user-facing response does so only 51% of the time. 3.5 Flash-Lite followed leaked grader code in 26/26 eligible cases. The keyword monitor catches 1.5% of unfaithful Qwen uptake; the LLM monitor catches 54.5% but has a 23% false-positive rate. Judge vs blind 100-case audit: 98% agreement, κ = 0.96.
+- Benchmark built: 4,000 questions × 6 conditions (24,000 prompts).
+## Cuts / not done (also in README Limitations)
+- Qwen run on 750 of 4,000 questions (GPU queue + deadline); `run_qwen_chunks.sh` resumes the rest.
+- API subjects are small (Gemini 3.5-FL 50 q, 3.1-FL 25 q, Gemma-4-26B 40 q) because of shared free-tier daily caps.
+- Qwen LLM monitor partial (444/707 cases); ~3% of Qwen judge batches failed on API errors and were not retried.
+- Gemma 4: 39% of outputs truncated at 16k tokens (treated as missing).
+- Manual audit labels were made by the AI assistant (Claude), blind to the judge's labels, not by independent humans.
+- No Hugging Face upload (no token).

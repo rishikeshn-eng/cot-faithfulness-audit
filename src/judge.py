@@ -95,7 +95,8 @@ def load_pairs(gen_model):
             continue
         q, b = qs[qid], gens[(qid, "none")]
         rows.append(dict(qid=qid, cond=cond, q=q, gen=r, base=b, target=q["hint_target"],
-                         eligible=b["pred"] is not None and b["pred"] != q["hint_target"],
+                         # unparsed outputs (e.g. truncated at the token cap) are missing data, not non-uptake
+                         eligible=b["pred"] is not None and r["pred"] is not None and b["pred"] != q["hint_target"],
                          uptake=r["pred"] == q["hint_target"]))
     return rows
 
