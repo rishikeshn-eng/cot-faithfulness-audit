@@ -16,6 +16,30 @@
 .case>div:nth-child(2){font-size:16px}
 #more{margin:8px 0 0}
 </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap">
+<style id="theme">
+:root:root:root{--bg:#FFF1EC;--surface:#FFFFFF;--surface-2:#FCE3DC;--ink:#1B1A55;--ink-2:#2F2D70;--muted:#55538A;--line:rgba(27,26,85,.14);--line-2:rgba(27,26,85,.26);--dye:#D4006E;--dye-dark:#D4006E;--on-dye:#FFFFFF;--dye-soft:rgba(212,0,110,.12);--link:#0057A8;--blk:#0057A8;--blk-ink:#FFFFFF;--c1:#0057A8;--c2:#D4006E;--c3:#00866E;--c4:#B86E00;--c5:#6B3FA0;--c6:#55538A;--good:#00866E;--bad:#D4006E;--warn:#B86E00;--display:'Instrument Serif',Georgia,serif;--h1-w:400;--h1-ls:-.01em;--plate-filter:none;--tex:radial-gradient(rgba(212,0,110,.16) 1.1px,transparent 1.7px) 0 0/8px 8px,radial-gradient(rgba(0,87,168,.10) 1.1px,transparent 1.7px) 4px 4px/8px 8px;--grain:.07;--color-scheme:light;}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:var(--tex);opacity:var(--tex-o,1)}
+body::after{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 .55 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:220px;opacity:var(--grain,.08);mix-blend-mode:overlay}
+.labbar{background:var(--blk);border-bottom:0;-webkit-backdrop-filter:none;backdrop-filter:none}
+.labbar .home,.labbar nav a,.labbar nav a.gh{color:var(--blk-ink)}
+.labbar nav a:hover{background:color-mix(in srgb,var(--blk-ink) 14%,transparent);color:var(--blk-ink)}
+.labbar .home i{background:var(--blk-ink);color:var(--blk)}
+h1,h2,h3,.readout,.verdict,.kpi b,.stat b,.tile .v,.stat .v{font-family:var(--display)}
+h1{font-size:clamp(38px,6.2vw,72px);line-height:1.02;letter-spacing:var(--h1-ls,-.02em);font-weight:var(--h1-w,800);max-width:18ch}
+.seal{background:var(--dye);color:var(--on-dye);border-color:var(--dye);box-shadow:6px 6px 0 var(--ink)}
+.kpis,.stats,.tiles,#headline.grid{background:var(--blk);border:0;gap:0;border-radius:var(--r);box-shadow:8px 8px 0 var(--ink)}
+.kpi,.stat,.tile,#headline .stat{background:transparent;border-left:1px solid color-mix(in srgb,var(--blk-ink) 22%,transparent)}
+.kpi b,.stat b,.tile .v,.stat .v,.kpi:first-child b,.stat:first-child b,.tile:first-child .v,#headline .stat:first-child .v{color:var(--blk-ink)}
+.kpi span,.stat span,.tile .l,.stat .k{color:color-mix(in srgb,var(--blk-ink) 85%,transparent)}
+.lab-panel{border:2px solid var(--ink);border-top:10px solid var(--dye);box-shadow:8px 8px 0 var(--ink)}
+.seg{background:color-mix(in srgb,var(--ink) 9%,transparent)}
+.seg button[aria-pressed="true"]{background:var(--dye);color:var(--on-dye);box-shadow:none}
+.track{background:color-mix(in srgb,var(--ink) 12%,transparent)}
+.card,.panel,.case,.tbl,.tablewrap,figure{border-color:color-mix(in srgb,var(--ink) 22%,transparent)}
+button.primary{box-shadow:4px 4px 0 var(--ink)}
+h1{text-shadow:4px 3px 0 rgba(212,0,110,.55);font-style:italic}h2{text-shadow:2px 2px 0 rgba(212,0,110,.35)}
+</style>
 </head>
 <body>
 <header class="labbar"><div class="labbar-in"><a class="home" href="https://claude.ai/artifact/HFzmFTYLBw6n7KTCFKAdSQ"><i>律</i>Rishikesh Nair</a><nav aria-label="Sections"><a class="ex" href="#explore">Explore</a><a href="#uptake-and-verbalisation-by-hint-type">Uptake</a><a href="#difficulty-and-hint-correctness">Difficulty</a><a href="#can-a-cot-monitor-catch-hint-use">Monitors</a><a href="#case-explorer">Cases</a><a class="gh" href="https://github.com/rishikeshn-eng/cot-faithfulness-audit">GitHub ↗</a></nav></div></header>
